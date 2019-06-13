@@ -1,0 +1,254 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Restaurant Review App
+# during dev, should point to your local machine
+host: localhost:3001
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+tags:
+  - name: restaurants
+  - name: reviews
+  - name: comments
+  - name: users
+paths:
+  /restaurants:
+    get:
+      tags:
+        - restaurants
+      x-swagger-router-controller: restaurant
+      description: Returns all restaurants
+      # used as the method name of the controller
+      operationId: getRestaurants
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GetRestaurantListResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      tags:
+        - restaurants
+      x-swagger-router-controller: restaurant
+      description: Creates restaurant
+      # used as the method name of the controller
+      operationId: createRestaurant
+      parameters:
+        - in: body
+          name: review
+          description: The restaurant to create.
+          schema:
+            $ref: "#/definitions/RestaurantNew"
+      responses:
+        "201":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GetRestaurantListResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /restaurants/{id}:
+    delete:
+      tags:
+        - restaurants
+      summary: Delete a restaurant
+      description: Deletes a restaurant by id
+      operationId: deleteRestaurant
+      parameters:
+        - name: id
+          in: path
+          description: Restaurant id to delete
+          required: true
+          type: integer
+      responses:
+        200:
+          description: OK
+        '404':
+          description: Restaurant not found
+  /reviews:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: review
+    get:
+      tags:
+        - reviews
+      description: Returns all reviews for a restaurant
+      # used as the method name of the controller
+      operationId: getReviews
+      parameters:
+        - name: id
+          in: query
+          description: The id of the restaurant
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GetReviewListResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      tags:
+        - reviews
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: review
+          description: The user to create.
+          schema:
+            $ref: "#/definitions/ReviewNew"
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /reviews/comments/{reviewId}:
+    x-swagger-router-controller: review
+    get:
+      tags:
+        - reviews
+      parameters:
+        - name: reviewId
+          in: path
+          description: Review ID to get comments for
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Comments for a review
+  /users:
+    x-swagger-router-controller: user
+    get:
+      operationId: getUsers
+      description: Admin gets all users
+      responses:
+        200:
+          description: Returns users
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  RestaurantNew:
+    type: object
+    properties:
+      userId:
+        type: integer
+        description: userId for owner
+      name:
+        type: string
+  RestaurantGet:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  GetRestaurantListResponse:
+    required:
+      - restaurants
+    properties:
+      # The array of movies
+      restaurants:
+        type: array
+        items:
+          $ref: "#/definitions/RestaurantGet"
+  Comment:
+    type: object
+    properties:
+      id:
+        type: integer
+      body:
+        type: string
+  ReviewNew:
+    type: object
+    properties:
+      restaurantId:
+        type: number
+      body:
+        type: string
+      stars:
+        type: integer
+        minimum: 0
+        maximum: 5
+  ReviewGet:
+    type: object
+    properties:
+      id:
+        type: number
+      body:
+        type: string
+      stars:
+        type: integer
+        minimum: 0
+        maximum: 5
+      created:
+        type: string
+      comments:
+        type: array
+        items:
+          $ref: '#/definitions/Comment'
+  GetReviewListResponse:
+    required:
+      - reviews
+    properties:
+      # The array of movies
+      reviews:
+        type: array
+        items: 
+          $ref: "#/definitions/ReviewGet"
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      firstName:
+        type: string
+      lastName:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      userStatus:
+        type: integer
+        format: int32
+        description: User Status
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
