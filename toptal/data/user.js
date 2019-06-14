@@ -14,11 +14,16 @@ module.exports = (sequelize, DataTypes) => {
         return () => this.getDataValue('password');
       },
     },
+    user_type: {
+      type: DataTypes.STRING,
+      get() {
+        return () => this.getDataValue('user_type');
+      },
+    },
     active: { type: DataTypes.BOOLEAN, defaultValue: 1 },
-    created: { type: DataTypes.DATE, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
-    updated: { type: DataTypes.DATE, defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP') },
   }, {
-    timestamps: false,
+    timestamps: true,
+    underscored: true,
     tableName: 'users',
   });
 

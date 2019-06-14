@@ -8,10 +8,9 @@ module.exports = (sequelize, DataTypes) => {
     review_id: DataTypes.INTEGER,
     body: DataTypes.TEXT,
     user_id: DataTypes.INTEGER,
-    created: { type: DataTypes.DATE, defaultValue: sequelize.literal('CURRENT_TIMESTAMP') },
-    updated: { type: DataTypes.DATE, defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP') },
   }, {
-    timestamps: false,
+    timestamps: true,
+    underscored: true,
     tableName: 'comments',
   });
 

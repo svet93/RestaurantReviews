@@ -45,10 +45,7 @@ paths:
     post:
       tags:
         - restaurants
-      x-swagger-router-controller: restaurant
       description: Creates restaurant
-      # used as the method name of the controller
-      operationId: createRestaurant
       parameters:
         - in: body
           name: review
@@ -72,7 +69,6 @@ paths:
         - restaurants
       summary: Delete a restaurant
       description: Deletes a restaurant by id
-      operationId: deleteRestaurant
       parameters:
         - name: id
           in: path
@@ -84,19 +80,15 @@ paths:
           description: OK
         '404':
           description: Restaurant not found
-  /reviews:
-    # binds a127 app logic to a route
-    x-swagger-router-controller: review
+  /reviews/{restaurantId}:
     get:
       tags:
         - reviews
+      summary: Gets all reviews for a restaurant
       description: Returns all reviews for a restaurant
-      # used as the method name of the controller
-      operationId: getReviews
       parameters:
-        - name: id
-          in: query
-          description: The id of the restaurant
+        - name: restaurantId
+          in: path
           required: true
           type: integer
       responses:
@@ -116,6 +108,10 @@ paths:
       consumes:
         - application/json
       parameters:
+        - in: path
+          name: restaurantId
+          required: true
+          type: integer
         - in: body
           name: review
           description: The user to create.
@@ -124,8 +120,6 @@ paths:
       responses:
         "201":
           description: Created
-          schema:
-            type: string
         default:
           description: Error
           schema:
@@ -144,10 +138,44 @@ paths:
       responses:
         200:
           description: Comments for a review
+  /comments/{id}:
+    post:
+      tags:
+        - comments
+      description: Delete comment with id
+      parameters:
+        - name: id
+          description: the id of the review
+          in: path
+          required: true
+          type: integer
+      responses:
+        "201":
+          description: Created
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      tags:
+        - comments
+      description: Delete comment with id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Deleted Successfully
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /users:
-    x-swagger-router-controller: user
     get:
-      operationId: getUsers
+      tags:
+        - users
       description: Admin gets all users
       responses:
         200:
@@ -155,7 +183,41 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/User"
+              $ref: "#/definitions/UserGet"
+    post:
+      tags:
+        - users
+      description: Creates a user
+      parameters:
+        - in: body
+          name: review
+          description: The restaurant to create.
+          schema:
+            $ref: "#/definitions/UserNew"
+      responses:
+        "201":
+          description: Created
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /users/{id}:
+    delete:
+      tags:
+        - users
+      description: Delete user with coresponding id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Deleted Successfully
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -194,8 +256,8 @@ definitions:
   ReviewNew:
     type: object
     properties:
-      restaurantId:
-        type: number
+      userId:
+        type: integer
       body:
         type: string
       stars:
@@ -228,7 +290,7 @@ definitions:
         type: array
         items: 
           $ref: "#/definitions/ReviewGet"
-  User:
+  UserGet:
     type: object
     properties:
       id:
@@ -242,10 +304,25 @@ definitions:
         type: string
       password:
         type: string
-      userStatus:
-        type: integer
-        format: int32
-        description: User Status
+      userType:
+        type: string
+      active:
+        type: boolean
+  UserNew:
+    type: object
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      userType:
+        type: string
+      active:
+        type: boolean
   ErrorResponse:
     required:
       - message
