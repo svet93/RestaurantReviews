@@ -9,11 +9,13 @@ const Logger = require('../../utils/logger');
 exports.getReviews = async (req, res) => {
   const {
     restaurantId,
-  } = req.params;
+  } = req.query;
+
+  const where = restaurantId ? { restaurant_id: { [Op.eq]: restaurantId } } : {};
 
   try {
     const reviews = await Review.findAll({
-      where: { restaurant_id: { [Op.eq]: restaurantId } },
+      where,
       include: [
         User,
         { model: Comment, include: [User] },
@@ -50,7 +52,7 @@ exports.createReview = async (req, res) => {
     Logger.error(error);
   }
   return res.status(500).send('Server Error');
-}
+};
 
 exports.deleteReview = async (req, res) => {
   const {
@@ -71,5 +73,51 @@ exports.deleteReview = async (req, res) => {
   } catch (error) {
     Logger.error(error);
   }
-  return res.status(500).send('Server Error');  
-}
+  return res.status(500).send('Server Error');
+};
+
+exports.createComment = async (req, res) => {
+  const {
+    userId,
+    body,
+  } = req.body;
+
+  const {
+    id,
+  } = req.params;
+
+  try {
+    const comment = await Comment.create({
+      review_id: id,
+      body,
+      user_id: userId,
+    });
+
+    return res.status(201).json(comment);
+  } catch (error) {
+    Logger.error(error);
+  }
+  return res.status(500).send('Server Error');
+};
+
+exports.deleteComent = async (req, res) => {
+  const {
+    id,
+  } = req.params;
+
+  try {
+    const comment = await Comment.findOne({
+      where: { review_id: { [Op.eq]: id } },
+    });
+
+    if (!comment) {
+      return res.status(404).send('Comment not found');
+    }
+
+    await comment.destroy();
+    return res.status(200).send('Comment deleted');
+  } catch (error) {
+    Logger.error(error);
+  }
+  return res.status(500).send('Server Error');
+};

@@ -29,7 +29,7 @@ exports.createRestaurant = async (req, res) => {
     Logger.error(error);
   }
   return res.status(500).send('Server Error');
-}
+};
 
 exports.deleteRestaurant = async (req, res) => {
   const {
@@ -50,5 +50,5 @@ exports.deleteRestaurant = async (req, res) => {
   } catch (error) {
     Logger.error(error);
   }
-  return res.status(500).send('Server Error');  
-}
+  return res.status(500).send('Server Error');
+};

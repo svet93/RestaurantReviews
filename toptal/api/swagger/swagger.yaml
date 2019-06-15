@@ -20,7 +20,6 @@ produces:
 tags:
   - name: restaurants
   - name: reviews
-  - name: comments
   - name: users
 paths:
   /restaurants:
@@ -80,7 +79,7 @@ paths:
           description: OK
         '404':
           description: Restaurant not found
-  /reviews/{restaurantId}:
+  /reviews:
     get:
       tags:
         - reviews
@@ -88,8 +87,7 @@ paths:
       description: Returns all reviews for a restaurant
       parameters:
         - name: restaurantId
-          in: path
-          required: true
+          in: query
           type: integer
       responses:
         "200":
@@ -124,31 +122,38 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /reviews/comments/{reviewId}:
-    x-swagger-router-controller: review
-    get:
+  /reviews/{id}:
+    delete:
       tags:
         - reviews
       parameters:
-        - name: reviewId
-          in: path
-          description: Review ID to get comments for
+        - in: path
+          name: id
           required: true
           type: integer
       responses:
-        200:
-          description: Comments for a review
-  /comments/{id}:
+        "200":
+          description: Deleted
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /reviews/{id}/comment:
     post:
       tags:
-        - comments
-      description: Delete comment with id
+        - reviews
+      description: Create comment for review
       parameters:
         - name: id
           description: the id of the review
           in: path
           required: true
           type: integer
+        - name: comment
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/CommentNew"
       responses:
         "201":
           description: Created
@@ -156,9 +161,10 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /reviews/comments/{id}:
     delete:
       tags:
-        - comments
+        - reviews
       description: Delete comment with id
       parameters:
         - name: id
@@ -253,6 +259,13 @@ definitions:
         type: integer
       body:
         type: string
+  CommentNew:
+    type: object
+    properties:
+      body:
+        type: string
+      userId:
+        type: integer
   ReviewNew:
     type: object
     properties:
