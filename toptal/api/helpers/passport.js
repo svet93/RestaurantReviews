@@ -2,6 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const FacebookStrategy = require('passport-facebook').Strategy;
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const bcrypt = require('bcryptjs');
 const Logger = require('../../utils/logger');
 
@@ -36,7 +37,6 @@ passport.use(new LocalStrategy(
       if (!dbUser) {
         return cb(null, false, { message: 'Incorrect email or password.' });
       }
-
       const isPasswordValid = await bcrypt.compare(password, dbUser.password());
 
       if (!isPasswordValid) {
@@ -46,6 +46,7 @@ passport.use(new LocalStrategy(
       const user = {
         email: dbUser.email,
         userId: dbUser.id,
+        role: dbUser.user_type(),
       };
 
       return cb(null, user, { message: 'Logged In Successfully' });
@@ -61,9 +62,8 @@ passport.use(new FacebookStrategy({
   clientSecret: process.env.FACEBOOK_APP_SECRET,
   callbackURL: 'https://tpc.ngrok.io/auth/facebook/callback',
   profileFields: ['id', 'emails', 'name'],
-  passReqToCallback: true,
 },
-(async (req, accessToken, refreshToken, profile, done) => {
+(async (accessToken, refreshToken, profile, done) => {
   try {
     if (!profile || !profile.emails || !profile.name) {
       throw new Error('Missing required paramters');
@@ -79,6 +79,38 @@ passport.use(new FacebookStrategy({
     });
 
     return done(null, {
+      userId: user.user_id,
+      email: user[0].email,
+      role: user[0].user_type(),
+    });
+  } catch (error) {
+    Logger.error(error);
+    return done(error);
+  }
+})));
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: 'https://tpc.ngrok.io/auth/google/callback',
+},
+(async (accessToken, refreshToken, profile, done) => {
+  try {
+    if (!profile || !profile.emails || !profile.name) {
+      throw new Error('Missing required paramters');
+    }
+    const user = await User.findOrCreate({
+      where: { email: { [Op.eq]: profile.emails[0].value } },
+      defaults: {
+        first_name: profile.name.givenName,
+        last_name: profile.name.familyName,
+        password: Math.random().toString(36).substr(-8),
+        user_type: 'regular',
+      },
+    });
+
+    return done(null, {
+      userId: user.user_id,
       email: user[0].email,
       role: user[0].user_type(),
     });

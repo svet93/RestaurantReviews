@@ -54,5 +54,5 @@ exports.socialLogin = (req, res) => {
     expiresIn: '4h',
   });
 
-  return res.redirect(`localhost:3000/login/${token}`);
+  return res.redirect(`http://localhost:3000/signin/${token}`);
 };

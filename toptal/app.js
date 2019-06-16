@@ -19,10 +19,11 @@ const restaurantRouter = require('./api/routes/restaurants');
 const reviewRouter = require('./api/routes/reviews');
 const userRouter = require('./api/routes/users');
 const authRouter = require('./api/routes/auth');
+const accountRouter = require('./api/routes/account');
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 app.use(helmet({
   frameguard: false,
 }));
@@ -34,5 +35,6 @@ app.use('/auth', authRouter);
 app.use('/restaurants', passport.authenticate('jwt'), restaurantRouter);
 app.use('/reviews', passport.authenticate('jwt'), reviewRouter);
 app.use('/users', passport.authenticate('jwt'), userRouter);
+app.use('/account', passport.authenticate('jwt'), accountRouter);
 
 module.exports = app;

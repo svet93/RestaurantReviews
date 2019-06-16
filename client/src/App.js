@@ -45,7 +45,7 @@ class App extends Component {
         <div>
           <Switch>
             <Route
-              path="/signin/:token?"
+              path="/signin/:socialToken?"
               exact
               component={() => <Signin />}
             />

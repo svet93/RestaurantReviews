@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-// import TopHeader from './components/header/topHeader';
+import TopHeader from './components/top_header';
 
 
 const PrivateRoute = ({ component: Component, isAuthenticated, ...rest }) => (
@@ -12,7 +12,7 @@ const PrivateRoute = ({ component: Component, isAuthenticated, ...rest }) => (
       isAuthenticated === true
         ? (
           <div>
-            {/* <TopHeader /> */}
+            <TopHeader />
             <Component {...props} {...rest} />
           </div>
         )
