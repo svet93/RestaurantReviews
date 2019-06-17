@@ -16,6 +16,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import RestaurantIcon from '@material-ui/icons/Restaurant';
 import AccountIcon from '@material-ui/icons/AccountCircle';
+import PeopleIcon from '@material-ui/icons/People';
+import ListIcon from '@material-ui/icons/List';
 import * as actions from '../actions';
 
 const cookies = new Cookies();
@@ -56,26 +58,39 @@ const ButtonAppBar = (props) => {
     setState({ ...state, [side]: open });
   };
 
-  const sideList = side => (
-    <div
-      className={classes.list}
-      role="presentation"
-      onClick={toggleDrawer(side, false)}
-      onKeyDown={toggleDrawer(side, false)}
-    >
-      <List>
-        {[
-          { text: 'Restaurants', href: '/', icon: RestaurantIcon },
-          { text: 'Account', href: '/account' },
-        ].map((link, index) => (
-          <ListItem button key={link.text}>
-            <ListItemIcon>{index % 2 === 0 ? <RestaurantIcon /> : <AccountIcon />}</ListItemIcon>
-            <Link href={link.href}><ListItemText primary={link.text} /></Link>
-          </ListItem>
-        ))}
-      </List>
-    </div>
-  );
+  const sideList = (side) => {
+    const menuItems = [
+      { text: 'Restaurants', href: '/', Icon: RestaurantIcon },
+      { text: 'Account', href: '/account', Icon: AccountIcon },
+    ];
+
+    const role = localStorage.getItem('role');
+    if (role === 'admin') {
+      menuItems.push({ text: 'Users', href: '/users', Icon: PeopleIcon });
+    } else if (role === 'owner') {
+      menuItems.push({ text: 'Reviews', href: '/myreviews', Icon: ListIcon });
+    }
+    return (
+      <div
+        className={classes.list}
+        role="presentation"
+        onClick={toggleDrawer(side, false)}
+        onKeyDown={toggleDrawer(side, false)}
+      >
+        <List>
+          {menuItems.map((link, index) => {
+            const Iconn = link.Icon;
+            return (
+              <ListItem button key={link.text}>
+                <ListItemIcon><Iconn /></ListItemIcon>
+                <Link href={link.href}><ListItemText primary={link.text} /></Link>
+              </ListItem>
+            );
+          })}
+        </List>
+      </div>
+    );
+  };
 
 
   return (

@@ -7,6 +7,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     user_id: DataTypes.INTEGER,
     name: DataTypes.STRING,
+    description: DataTypes.STRING,
+    image_url: DataTypes.STRING,
     active: { type: DataTypes.BOOLEAN, defaultValue: 1 },
   }, {
     timestamps: true,

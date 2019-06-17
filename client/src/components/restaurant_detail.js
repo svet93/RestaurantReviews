@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { CssBaseline } from '@material-ui/core';
@@ -20,21 +21,22 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Home = () => {
+const RestaurantDetail = (props) => {
+  const { id } = props.match.params;
   const classes = useStyles();
-  const [restaurants, setRestaurants] = useState([]);
+  const [reviews, setReviews] = useState([]);
   useEffect(() => {
-    axios.get(`${API_URL}/restaurants`).then((result) => {
+    axios.get(`${API_URL}/reviews`, { params: { restaurantId: id } }).then((result) => {
       const nRestaurants = result.data;
       console.log(nRestaurants);
-      setRestaurants(nRestaurants);
+      setReviews(nRestaurants);
     });
   }, []);
   return (
     <Container component="main" maxWidth="sm">
       <CssBaseline />
       <div className={classes.paper}>
-        {restaurants.map(r => (
+        {reviews.map(r => (
           <RestaurantCard
             key={r.id}
             id={r.id}
@@ -49,4 +51,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withRouter(RestaurantDetail);

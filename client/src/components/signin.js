@@ -79,7 +79,7 @@ const SignIn = (props) => {
             },
           });
           const { user, token } = res.data;
-          localStorage.setItem('role', JSON.stringify(user.role));
+          localStorage.setItem('role', user.role);
           cookies.remove('token', { path: '/' });
           cookies.set('token', token, {
             path: '/',
@@ -93,7 +93,7 @@ const SignIn = (props) => {
       }
       blah();
     }
-  });
+  }, []);
 
   if (props.isAuthenticated) {
     return <Redirect to="/" />;

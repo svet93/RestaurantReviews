@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         return () => this.getDataValue('user_type');
       },
     },
+    verified: { type: DataTypes.BOOLEAN, defaultValue: 0 },
     active: { type: DataTypes.BOOLEAN, defaultValue: 1 },
   }, {
     timestamps: true,

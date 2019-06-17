@@ -6,7 +6,10 @@ const basename = path.basename(module.filename);
 const db = {};
 const sequelize = new Sequelize(process.env.DB_URL, {
   dialect: 'mysql',
-  logging: false,
+  // logging: false,
+  logging: (str) => {
+    console.log(str);
+  },
 });
 
 fs.readdirSync(__dirname)

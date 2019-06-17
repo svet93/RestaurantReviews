@@ -16,6 +16,7 @@ import Signin from './components/signin';
 import Signup from './components/signup';
 import ResetPassword from './components/forgot_pass';
 import Home from './components/home';
+import Restaurant from './components/restaurant_detail';
 
 const buildRoutes = () => {
   const routes = [
@@ -23,6 +24,11 @@ const buildRoutes = () => {
       path: '/',
       exact: true,
       main: () => <Home />,
+    },
+    {
+      path: '/restaurants/:id',
+      exact: true,
+      main: () => <Restaurant />,
     },
     // {
     //   path: '/account/changePassword',
