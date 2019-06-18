@@ -44,7 +44,7 @@ exports.createReview = async (req, res) => {
       restaurant_id: restaurantId,
       body,
       stars,
-      user_id: userId,
+      user_id: userId || req.user.userId,
     });
 
     return res.status(201).json(review);

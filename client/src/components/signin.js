@@ -33,6 +33,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
     margin: theme.spacing(1),
@@ -69,15 +70,13 @@ const SignIn = (props) => {
 
   useEffect(() => {
     const { socialToken } = props.match.params;
-    if (socialToken) {
-      // eslint-disable-next-line no-inner-declarations
-      async function blah() {
-        try {
-          const res = await axios.post(`${API_URL}/account/refreshToken`, null, {
-            headers: {
-              Authorization: socialToken ? `Bearer ${socialToken}` : '',
-            },
-          });
+    const autoLogin = () => {
+      try {
+        axios.post(`${API_URL}/account/refreshToken`, null, {
+          headers: {
+            Authorization: socialToken ? `Bearer ${socialToken}` : '',
+          },
+        }).then((res) => {
           const { user, token } = res.data;
           localStorage.setItem('role', user.role);
           cookies.remove('token', { path: '/' });
@@ -87,11 +86,13 @@ const SignIn = (props) => {
           });
 
           props.fetchAuthenticated(token);
-        } catch (error) {
-          console.error(error);
-        }
+        });
+      } catch (error) {
+        console.error(error);
       }
-      blah();
+    };
+    if (socialToken) {
+      autoLogin();
     }
   }, []);
 

@@ -45,11 +45,14 @@ passport.use(new LocalStrategy(
 
       const user = {
         email: dbUser.email,
-        userId: dbUser.id,
+        userId: dbUser.user_id,
         role: dbUser.user_type(),
       };
 
-      return cb(null, user, { message: 'Logged In Successfully' });
+      if (dbUser.verified) {
+        return cb(null, user, { message: 'Logged In Successfully' });
+      }
+      return cb('User email not verified');
     } catch (err) {
       Logger.error(err);
       return cb(err);
@@ -68,21 +71,18 @@ passport.use(new FacebookStrategy({
     if (!profile || !profile.emails || !profile.name) {
       throw new Error('Missing required paramters');
     }
-    const user = await User.findOrCreate({
+    const user = await User.findOne({
       where: { email: { [Op.eq]: profile.emails[0].value } },
-      defaults: {
-        first_name: profile.name.givenName,
-        last_name: profile.name.familyName,
-        password: Math.random().toString(36).substr(-8),
-        user_type: 'regular',
-      },
     });
 
-    return done(null, {
-      userId: user.user_id,
-      email: user[0].email,
-      role: user[0].user_type(),
-    });
+    if (user.verified) {
+      return done(null, {
+        userId: user.user_id,
+        email: user.email,
+        role: user.user_type(),
+      });
+    }
+    return done('User email not verified', null);
   } catch (error) {
     Logger.error(error);
     return done(error);
@@ -99,21 +99,20 @@ passport.use(new GoogleStrategy({
     if (!profile || !profile.emails || !profile.name) {
       throw new Error('Missing required paramters');
     }
-    const user = await User.findOrCreate({
-      where: { email: { [Op.eq]: profile.emails[0].value } },
-      defaults: {
-        first_name: profile.name.givenName,
-        last_name: profile.name.familyName,
-        password: Math.random().toString(36).substr(-8),
-        user_type: 'regular',
+    const user = await User.findOne({
+      where: {
+        email: { [Op.eq]: profile.emails[0].value },
       },
     });
 
-    return done(null, {
-      userId: user.user_id,
-      email: user[0].email,
-      role: user[0].user_type(),
-    });
+    if (user.verified) {
+      return done(null, {
+        userId: user.user_id,
+        email: user.email,
+        role: user.user_type(),
+      });
+    }
+    return done('User email not verified', null);
   } catch (error) {
     Logger.error(error);
     return done(error);

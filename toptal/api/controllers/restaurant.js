@@ -2,7 +2,9 @@ const {
   Comment,
   Review,
   Restaurant,
+  User,
   Sequelize: { Op },
+  sequelize,
 } = require('../../data');
 const Logger = require('../../utils/logger');
 
@@ -33,6 +35,9 @@ exports.getRestaurantDetail = async (req, res) => {
     id,
   } = req.params;
   try {
+    const restaurant = await Restaurant.findOne({
+      where: { restaurant_id: id },
+    });
     const highestReview = await Review.findOne({
       where: { restaurant_id: id },
       order: [['stars', 'DESC']],
@@ -43,13 +48,29 @@ exports.getRestaurantDetail = async (req, res) => {
     });
     const mostRecent = await Review.findAll({
       where: { restaurant_id: id },
-      include: [Comment],
+      include: [
+        User,
+        { model: Comment, include: [User] },
+      ],
       order: [['createdAt', 'DESC']],
     });
+    const ratingRes = await Review.findOne({
+      where: { restaurant_id: id },
+      attributes: [[sequelize.literal('(SUM(stars) / COUNT(*))'), 'rating']],
+      plain: true,
+    });
+    const plainRating = ratingRes.get({ plain: true });
     return res.json({
       highestReview,
       lowestReview,
-      mostRecent,
+      mostRecent: mostRecent.map(r => ({
+        name: `${r.User.first_name} ${r.User.last_name}`,
+        rating: r.stars,
+        body: r.body,
+        reply: r.Comments[0] ? r.Comments[0].body : '',
+      })),
+      rating: plainRating.rating,
+      restaurant,
     });
   } catch (error) {
     Logger.error(error);

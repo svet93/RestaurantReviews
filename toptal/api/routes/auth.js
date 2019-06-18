@@ -18,5 +18,6 @@ router.get('/google', passport.authenticate('google', {
 router.get('/google/callback', passport.authenticate('google'), controller.socialLogin);
 router.post('/login', controller.login);
 router.post('/signup', controller.signup);
+router.get('/verify/:token', controller.verifyEmail);
 
 module.exports = router;

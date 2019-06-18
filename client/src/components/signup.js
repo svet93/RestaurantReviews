@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -9,6 +10,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import axios from '../utils/axios';
+import { API_URL } from '../constants';
 
 
 const useStyles = makeStyles(theme => ({
@@ -38,6 +41,27 @@ const useStyles = makeStyles(theme => ({
 
 export default function SignUp() {
   const classes = useStyles();
+  const [values, setValues] = React.useState({
+    email: '',
+    firstName: '',
+    lastName: '',
+    password: '',
+  });
+
+  const handleChange = name => (event) => {
+    setValues({ ...values, [name]: event.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await axios.post(`${API_URL}/auth/signup`, {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      password: values.password,
+    });
+    return <Redirect to="/signin" />;
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -61,6 +85,8 @@ export default function SignUp() {
                 id="firstName"
                 label="First Name"
                 autoFocus
+                value={values.firstName}
+                onChange={handleChange('firstName')}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -72,6 +98,8 @@ export default function SignUp() {
                 label="Last Name"
                 name="lastName"
                 autoComplete="lname"
+                value={values.lastName}
+                onChange={handleChange('lastName')}
               />
             </Grid>
             <Grid item xs={12}>
@@ -83,6 +111,8 @@ export default function SignUp() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                value={values.email}
+                onChange={handleChange('email')}
               />
             </Grid>
             <Grid item xs={12}>
@@ -95,6 +125,8 @@ export default function SignUp() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={values.password}
+                onChange={handleChange('password')}
               />
             </Grid>
           </Grid>
@@ -104,6 +136,7 @@ export default function SignUp() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={handleSubmit}
           >
             Sign Up
           </Button>
