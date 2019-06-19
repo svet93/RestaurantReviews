@@ -17,6 +17,7 @@ import Signup from './components/signup';
 import ResetPassword from './components/forgot_pass';
 import Restaurants from './components/restaurants';
 import Restaurant from './components/restaurant_detail';
+import Account from './components/account';
 
 const buildRoutes = () => {
   const routes = [
@@ -40,10 +41,10 @@ const buildRoutes = () => {
       exact: true,
       main: () => <Restaurant isOwner />,
     },
-    // {
-    //   path: '/account/changePassword',
-    //   main: () => <ChangePassword />,
-    // },
+    {
+      path: '/account',
+      main: () => <Account />,
+    },
   ].map((route, i) => ({ ...route, key: i }));
 
   return routes;

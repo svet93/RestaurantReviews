@@ -8,11 +8,11 @@ const {
 
 
 const changePassword = async (req, res, next) => {
-  const { password, newPassword, newPasswordConfirm } = req.body;
+  const { password, newPassword, newPasswordConfirmed } = req.body;
   const cookieUser = req.user;
 
   try {
-    if (newPassword !== newPasswordConfirm) {
+    if (newPassword !== newPasswordConfirmed) {
       res.status(400).send('Passwords do not match');
     }
 
@@ -29,8 +29,7 @@ const changePassword = async (req, res, next) => {
       return res.status(401).send('The password entered is wrong');
     }
 
-    const saltRounds = Number.parseInt(process.env.BCRYPT_ROUNDS, 10) || 10;
-    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
 
