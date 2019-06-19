@@ -68,7 +68,7 @@ const ButtonAppBar = (props) => {
     if (role === 'admin') {
       menuItems.push({ text: 'Users', href: '/users', Icon: PeopleIcon });
     } else if (role === 'owner') {
-      menuItems.push({ text: 'Reviews', href: '/myreviews', Icon: ListIcon });
+      menuItems[0] = { text: 'My Restaurants', href: '/myRestaurants', Icon: ListIcon };
     }
     return (
       <div

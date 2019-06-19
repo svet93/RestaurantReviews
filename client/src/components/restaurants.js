@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { CssBaseline } from '@material-ui/core';
 import RestaurantCard from './restaurant_card';
 import axios from '../utils/axios';
 import { API_URL } from '../constants';
+
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -20,13 +22,16 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Home = () => {
+const Restaurants = (props) => {
   const classes = useStyles();
   const [restaurants, setRestaurants] = useState([]);
   useEffect(() => {
-    axios.get(`${API_URL}/restaurants`).then((result) => {
+    const options = {};
+    if (props.isOwner) {
+      options.params = { isOwner: true };
+    }
+    axios.get(`${API_URL}/restaurants`, options).then((result) => {
       const nRestaurants = result.data;
-      console.log(nRestaurants);
       setRestaurants(nRestaurants);
     });
   }, []);
@@ -42,6 +47,7 @@ const Home = () => {
             description={r.description}
             imageUrl={r.imageUrl}
             rating={r.rating}
+            handleClick={() => { props.history.push(`/${props.isOwner ? 'myRestaurants' : 'restaurants'}/${r.id}`); }}
           />
         ))}
       </div>
@@ -49,4 +55,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withRouter(Restaurants);

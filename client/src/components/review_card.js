@@ -1,7 +1,8 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Rating from './stars';
@@ -26,6 +27,7 @@ const useStyles = makeStyles(theme => ({
 const ReviewCard = (props) => {
   const classes = useStyles();
 
+  console.log(props);
   return (
     <Card className={classes.card}>
       <CardContent>
@@ -51,9 +53,21 @@ const ReviewCard = (props) => {
             </React.Fragment>
           )
         }
+        {(!props.reply && props.isOwner)
+          && (
+            <Fab
+              color="primary"
+              aria-label="Add"
+              className={classes.fab}
+              onClick={e => props.onFabClick(props.id)}
+            >
+              <AddIcon />
+            </Fab>
+          )
+        }
       </CardContent>
     </Card>
   );
 };
 
-export default withRouter(ReviewCard);
+export default ReviewCard;

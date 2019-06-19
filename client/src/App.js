@@ -15,7 +15,7 @@ import PrivateRoute from './private-route';
 import Signin from './components/signin';
 import Signup from './components/signup';
 import ResetPassword from './components/forgot_pass';
-import Home from './components/home';
+import Restaurants from './components/restaurants';
 import Restaurant from './components/restaurant_detail';
 
 const buildRoutes = () => {
@@ -23,12 +23,22 @@ const buildRoutes = () => {
     {
       path: '/',
       exact: true,
-      main: () => <Home />,
+      main: () => <Restaurants isOwner={false} />,
     },
     {
       path: '/restaurants/:id',
       exact: true,
-      main: () => <Restaurant />,
+      main: () => <Restaurant isOwner={false} />,
+    },
+    {
+      path: '/myRestaurants',
+      exact: true,
+      main: () => <Restaurants isOwner />,
+    },
+    {
+      path: '/myRestaurants/:id',
+      exact: true,
+      main: () => <Restaurant isOwner />,
     },
     // {
     //   path: '/account/changePassword',

@@ -1,5 +1,6 @@
 const {
   Comment,
+  Restaurant,
   Review,
   User,
   Sequelize: { Op },
@@ -78,7 +79,6 @@ exports.deleteReview = async (req, res) => {
 
 exports.createComment = async (req, res) => {
   const {
-    userId,
     body,
   } = req.body;
 
@@ -86,7 +86,21 @@ exports.createComment = async (req, res) => {
     id,
   } = req.params;
 
+  const {
+    userId,
+  } = req.user;
+
   try {
+    const review = await Review.findOne({
+      where: { review_id: { [Op.eq]: id } },
+      include: [
+        { model: Restaurant, include: [User] },
+      ],
+    });
+
+    if (review.Restaurant.User.user_id !== userId) {
+      return res.status(401).send('Only restaurant owner can reply to reviews');
+    }
     const comment = await Comment.create({
       review_id: id,
       body,

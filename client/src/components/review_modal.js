@@ -1,9 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import Rating from 'material-ui-rating';
 
 
 const useStyles = makeStyles(theme => ({
@@ -41,31 +38,7 @@ const SimpleModal = (props) => {
         style={{ alignItems: 'center', justifyContent: 'center' }}
       >
         <div className={classes.paper}>
-          <Rating
-            value={props.stars}
-            max={5}
-            onChange={value => props.handleRatingChange(value)}
-          />
-          <TextField
-            id="standard-multiline-flexible"
-            label="Comment"
-            multiline
-            rows="2"
-            rowsMax="4"
-            value={props.comment}
-            onChange={props.handleChange('newComment')}
-            className={classes.textField}
-            margin="normal"
-            inputProps={{ maxLength: 250 }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={props.handleSubmit}
-          >
-            Add
-          </Button>
+          {props.form}
         </div>
       </Modal>
     </div>

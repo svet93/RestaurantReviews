@@ -1,5 +1,4 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -29,7 +28,7 @@ const RestaurantCard = (props) => {
 
   return (
     <Card className={classes.card}>
-      <CardActionArea onClick={() => { props.history.push(`/restaurants/${props.id}`); }}>
+      <CardActionArea onClick={props.handleClick}>
         <CardMedia
           component="img"
           alt={props.name}
@@ -54,4 +53,4 @@ const RestaurantCard = (props) => {
   );
 };
 
-export default withRouter(RestaurantCard);
+export default RestaurantCard;

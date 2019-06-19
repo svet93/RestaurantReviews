@@ -4,8 +4,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -51,22 +49,35 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const handleLoginLocal = async (e, email, password) => {
-  e.preventDefault();
-  try {
-    await axios.post(`${API_URL}/auth/login`, {
-      email,
-      password,
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 const SignIn = (props) => {
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const setVariables = (user, token) => {
+    localStorage.setItem('role', user.role);
+    cookies.remove('token', { path: '/' });
+    cookies.set('token', token, {
+      path: '/',
+      expires: new Date(Date.now() + 14400000),
+    });
+
+    props.fetchAuthenticated(token);
+  };
+
+  const handleLoginLocal = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password,
+      });
+      const { user, token } = res.data;
+      setVariables(user, token);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     const { socialToken } = props.match.params;
@@ -78,14 +89,7 @@ const SignIn = (props) => {
           },
         }).then((res) => {
           const { user, token } = res.data;
-          localStorage.setItem('role', user.role);
-          cookies.remove('token', { path: '/' });
-          cookies.set('token', token, {
-            path: '/',
-            expires: new Date(Date.now() + 14400000),
-          });
-
-          props.fetchAuthenticated(token);
+          setVariables(user, token);
         });
       } catch (error) {
         console.error(error);
@@ -111,7 +115,7 @@ const SignIn = (props) => {
           Sign in
         </Typography>
         <Box>
-          <Link href="https://tpc.ngrok.io/auth/google">
+          <Link href={`${API_URL}/auth/google`}>
             <Button
               type="submit"
               fullWidth
@@ -127,7 +131,7 @@ const SignIn = (props) => {
               Log in with Google
             </Button>
           </Link>
-          <Link href="https://tpc.ngrok.io/auth/facebook">
+          <Link href={`${API_URL}/auth/facebook`}>
             <Button
               type="submit"
               fullWidth
@@ -147,7 +151,7 @@ const SignIn = (props) => {
         <form
           className={classes.form}
           noValidate
-          onSubmit={e => handleLoginLocal(e, email, password)}
+          onSubmit={handleLoginLocal}
         >
           <TextField
             onChange={e => setEmail(e.target.value)}
@@ -172,10 +176,6 @@ const SignIn = (props) => {
             type="password"
             id="password"
             autoComplete="current-password"
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
           />
           <Button
             type="submit"

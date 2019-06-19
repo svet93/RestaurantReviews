@@ -63,7 +63,7 @@ passport.use(new LocalStrategy(
 passport.use(new FacebookStrategy({
   clientID: process.env.FACEBOOK_APP_ID,
   clientSecret: process.env.FACEBOOK_APP_SECRET,
-  callbackURL: 'https://tpc.ngrok.io/auth/facebook/callback',
+  callbackURL: `${process.env.SERVER_URL}/auth/facebook/callback`,
   profileFields: ['id', 'emails', 'name'],
 },
 (async (accessToken, refreshToken, profile, done) => {
@@ -92,7 +92,7 @@ passport.use(new FacebookStrategy({
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://tpc.ngrok.io/auth/google/callback',
+  callbackURL: `${process.env.SERVER_URL}/auth/google/callback`,
 },
 (async (accessToken, refreshToken, profile, done) => {
   try {

@@ -8,9 +8,12 @@ import Typography from '@material-ui/core/Typography';
 import Fab from '@material-ui/core/Fab';
 import { CssBaseline } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import Rating from 'material-ui-rating';
 import ReviewCard from './review_card';
-import ReviewModal from './review_modal';
-import Rating from './stars';
+import Modal from './review_modal';
+import Stars from './stars';
 import axios from '../utils/axios';
 import { API_URL } from '../constants';
 
@@ -52,10 +55,12 @@ const RestaurantDetail = (props) => {
   const [newRating, setNewRating] = useState(3);
   const [values, setValues] = React.useState({
     newComment: '',
+    reply: '',
   });
 
   const [open, setOpen] = React.useState(false);
-  // getModalStyle is not a pure function, we roll the style only on the first render
+  const [openReply, setOpenReply] = React.useState(false);
+  const [currentReply, setCurrentReply] = React.useState(false);
 
   const handleOpenModal = () => {
     setOpen(true);
@@ -63,6 +68,15 @@ const RestaurantDetail = (props) => {
 
   const handleCloseModal = () => {
     setOpen(false);
+  };
+
+  const handleOpenReplyModal = (reviewId) => {
+    setOpenReply(true);
+    setCurrentReply(reviewId);
+  };
+
+  const handleCloseReplyModal = () => {
+    setOpenReply(false);
   };
 
   const handleRatingChange = (stars) => {
@@ -94,20 +108,85 @@ const RestaurantDetail = (props) => {
     loadData();
   };
 
+  const handleReplySubmit = async (e) => {
+    e.preventDefault();
+    setOpenReply(false);
+    await axios.post(`${API_URL}/reviews/${currentReply}/comment`, {
+      body: values.reply,
+    });
+    loadData();
+  };
+
   useEffect(() => {
     loadData();
   }, []);
 
   return (
     <Container component="main" maxWidth="sm">
-      <ReviewModal
+      <Modal
+        form={
+          (
+            <React.Fragment>
+              <Rating
+                value={newRating}
+                max={5}
+                onChange={value => handleRatingChange(value)}
+              />
+              <TextField
+                id="standard-multiline-flexible"
+                label="Comment"
+                multiline
+                rows="2"
+                rowsMax="4"
+                value={values.newComment}
+                onChange={handleChange('newComment')}
+                className={classes.textField}
+                margin="normal"
+                inputProps={{ maxLength: 250 }}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                onClick={handleReviewSubmit}
+              >
+                Add
+              </Button>
+            </React.Fragment>
+          )
+        }
         open={open}
-        stars={newRating}
-        comment={values.newComment}
         handleClose={handleCloseModal}
-        handleRatingChange={handleRatingChange}
-        handleChange={handleChange}
-        handleSubmit={handleReviewSubmit}
+      />
+      <Modal
+        form={
+        (
+          <React.Fragment>
+            <TextField
+              id="standard-multiline-flexible"
+              label="Reply"
+              multiline
+              rows="2"
+              rowsMax="4"
+              value={values.reply}
+              onChange={handleChange('reply')}
+              className={classes.textField}
+              margin="normal"
+              inputProps={{ maxLength: 250 }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              onClick={handleReplySubmit}
+            >
+              Add
+            </Button>
+          </React.Fragment>
+        )
+      }
+        open={openReply}
+        handleClose={handleCloseReplyModal}
       />
       <CssBaseline />
       <div className={classes.paper}>
@@ -115,39 +194,49 @@ const RestaurantDetail = (props) => {
           {restaurant.name}
         </Typography>
         <Box>
-          <Rating rating={rating} />
+          <Stars rating={rating} />
         </Box>
-        <Grid container spacing={5} className={classes.review}>
-          <Grid item xs={12} sm={6}>
-            <Typography color="textSecondary">
-              Best
-            </Typography>
-            <ReviewCard
-              className={classes.review}
-              id={highestReview.id}
-              name={highestReview.name}
-              body={highestReview.body}
-              rating={highestReview.stars}
-              reply={highestReview.reply}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Typography color="textSecondary">
-              Worst
-            </Typography>
-            <ReviewCard
-              className={classes.review}
-              id={lowestReview.id}
-              name={lowestReview.name}
-              body={lowestReview.body}
-              rating={lowestReview.stars}
-              reply={lowestReview.reply}
-            />
-          </Grid>
-        </Grid>
+        {!props.isOwner
+          && (
+            <Grid container spacing={5} className={classes.review}>
+              <Grid item xs={12} sm={6}>
+                <Typography color="textSecondary">
+                  Best
+                </Typography>
+                <ReviewCard
+                  isOwner={props.isOwner}
+                  onFabClick={handleOpenReplyModal}
+                  className={classes.review}
+                  id={highestReview.id}
+                  name={highestReview.name}
+                  body={highestReview.body}
+                  rating={highestReview.stars}
+                  reply={highestReview.reply}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography color="textSecondary">
+                  Worst
+                </Typography>
+                <ReviewCard
+                  isOwner={props.isOwner}
+                  onFabClick={handleOpenReplyModal}
+                  className={classes.review}
+                  id={lowestReview.id}
+                  name={lowestReview.name}
+                  body={lowestReview.body}
+                  rating={lowestReview.stars}
+                  reply={lowestReview.reply}
+                />
+              </Grid>
+            </Grid>
+          )
+        }
         {reviews.length ? reviews.map(r => (
           <ReviewCard
             key={r.id}
+            isOwner={props.isOwner}
+            onFabClick={handleOpenReplyModal}
             id={r.id}
             name={r.name}
             body={r.body}
@@ -162,14 +251,18 @@ const RestaurantDetail = (props) => {
           )
         }
       </div>
-      <Fab
-        color="primary"
-        aria-label="Add"
-        className={classes.fab}
-        onClick={handleOpenModal}
-      >
-        <AddIcon />
-      </Fab>
+      {!props.isOwner
+        && (
+        <Fab
+          color="primary"
+          aria-label="Add"
+          className={classes.fab}
+          onClick={handleOpenModal}
+        >
+          <AddIcon />
+        </Fab>
+        )
+      }
     </Container>
   );
 };

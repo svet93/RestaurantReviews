@@ -9,9 +9,16 @@ const {
 const Logger = require('../../utils/logger');
 
 exports.getRestaurants = async (req, res) => {
+  const {
+    isOwner,
+  } = req.query;
   try {
+    const where = { active: 1 };
+    if (isOwner) {
+      where.user_id = { [Op.eq]: req.user.userId };
+    }
     const restaurants = await Restaurant.findAll({
-      where: { active: 1 },
+      where,
       include: [Review],
     });
 
@@ -64,6 +71,7 @@ exports.getRestaurantDetail = async (req, res) => {
       highestReview,
       lowestReview,
       mostRecent: mostRecent.map(r => ({
+        id: r.review_id,
         name: `${r.User.first_name} ${r.User.last_name}`,
         rating: r.stars,
         body: r.body,
