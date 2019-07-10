@@ -18,6 +18,7 @@ import ResetPassword from './components/forgot_pass';
 import Restaurants from './components/restaurants';
 import Restaurant from './components/restaurant_detail';
 import Account from './components/account';
+import Users from './components/users';
 
 const buildRoutes = () => {
   const routes = [
@@ -44,6 +45,10 @@ const buildRoutes = () => {
     {
       path: '/account',
       main: () => <Account />,
+    },
+    {
+      path: '/users',
+      main: () => <Users />,
     },
   ].map((route, i) => ({ ...route, key: i }));
 

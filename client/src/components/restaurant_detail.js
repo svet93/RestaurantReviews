@@ -195,6 +195,9 @@ const RestaurantDetail = (props) => {
         </Typography>
         <Box>
           <Stars rating={rating} />
+          {
+            rating > 0 ? `${Number.parseFloat(rating).toFixed(1)} / 5` : ''
+          }
         </Box>
         {!props.isOwner
           && (

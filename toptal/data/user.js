@@ -14,12 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         return () => this.getDataValue('password');
       },
     },
-    user_type: {
-      type: DataTypes.STRING,
-      get() {
-        return () => this.getDataValue('user_type');
-      },
-    },
+    user_type: DataTypes.STRING,
     verified: { type: DataTypes.BOOLEAN, defaultValue: 0 },
     active: { type: DataTypes.BOOLEAN, defaultValue: 1 },
   }, {

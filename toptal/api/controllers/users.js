@@ -42,6 +42,33 @@ exports.createUsers = async (req, res) => {
   return res.status(500).send('Server Error');
 };
 
+exports.updateUser = async (req, res) => {
+  const {
+    id,
+  } = req.params;
+
+  const {
+    userType,
+  } = req.body;
+
+  try {
+    const user = await User.findOne({
+      where: { user_id: { [Op.eq]: id } },
+    });
+
+    if (!user) {
+      return res.status(404).send('Users not found');
+    }
+
+    user.user_type = userType;
+    await user.save();
+    return res.status(200).send('Users deleted');
+  } catch (error) {
+    Logger.error(error);
+  }
+  return res.status(500).send('Server Error');
+};
+
 exports.deleteUsers = async (req, res) => {
   const {
     id,

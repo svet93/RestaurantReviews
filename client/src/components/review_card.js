@@ -27,7 +27,6 @@ const useStyles = makeStyles(theme => ({
 const ReviewCard = (props) => {
   const classes = useStyles();
 
-  console.log(props);
   return (
     <Card className={classes.card}>
       <CardContent>

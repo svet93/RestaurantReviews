@@ -31,6 +31,7 @@ passport.use(new LocalStrategy(
         where: {
           email: { [Op.eq]: email },
           active: 1,
+          verified: 1,
         },
       });
 
@@ -46,7 +47,7 @@ passport.use(new LocalStrategy(
       const user = {
         email: dbUser.email,
         userId: dbUser.user_id,
-        role: dbUser.user_type(),
+        role: dbUser.user_type,
       };
 
       if (dbUser.verified) {
@@ -72,14 +73,18 @@ passport.use(new FacebookStrategy({
       throw new Error('Missing required paramters');
     }
     const user = await User.findOne({
-      where: { email: { [Op.eq]: profile.emails[0].value } },
+      where: {
+        email: { [Op.eq]: profile.emails[0].value },
+        active: 1,
+        verified: 1,
+      },
     });
 
-    if (user.verified) {
+    if (user) {
       return done(null, {
         userId: user.user_id,
         email: user.email,
-        role: user.user_type(),
+        role: user.user_type,
       });
     }
     return done('User email not verified', null);
@@ -102,14 +107,16 @@ passport.use(new GoogleStrategy({
     const user = await User.findOne({
       where: {
         email: { [Op.eq]: profile.emails[0].value },
+        active: 1,
+        verified: 1,
       },
     });
 
-    if (user.verified) {
+    if (user) {
       return done(null, {
         userId: user.user_id,
         email: user.email,
-        role: user.user_type(),
+        role: user.user_type,
       });
     }
     return done('User email not verified', null);

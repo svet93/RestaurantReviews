@@ -11,25 +11,33 @@ const Logger = require('../../utils/logger');
 exports.getRestaurants = async (req, res) => {
   const {
     isOwner,
+    rating,
   } = req.query;
   try {
     const where = { active: 1 };
     if (isOwner) {
       where.user_id = { [Op.eq]: req.user.userId };
     }
-    const restaurants = await Restaurant.findAll({
+
+    const filterObj = {
       where,
-      include: [Review],
-    });
+      include: [{ model: Review, attributes: [] }],
+      attributes: ['restaurant_id', 'name', 'description', 'image_url', [sequelize.fn('avg', sequelize.col('stars')), 'rating']],
+      group: ['restaurant_id', 'name', 'description', 'image_url'],
+    };
+
+    if (rating) {
+      filterObj.having = sequelize.where(sequelize.col('rating'), '>=', rating);
+    }
+
+    const restaurants = await Restaurant.findAll(filterObj);
 
     return res.json(restaurants.map(r => ({
       id: r.restaurant_id,
       name: r.name,
       description: r.description,
       imageUrl: r.image_url,
-      rating: r.Reviews.length
-        ? (r.Reviews.reduce((accu, curr) => (accu + curr.stars), 0.0)) / r.Reviews.length
-        : -1,
+      rating: r.dataValues.rating,
     })));
   } catch (error) {
     Logger.error(error);
