@@ -13,5 +13,5 @@ exports.sendSimpleEmail = async (emailTo, subject, message) => {
     html: message,
   };
 
-  sgMail.send(msg);
+  await sgMail.send(msg);
 };

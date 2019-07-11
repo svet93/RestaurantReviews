@@ -6,5 +6,5 @@ exports.checkAdmin = (req, res, next) => {
   if (role === 'admin') {
     return next();
   }
-  return res.status(401);
+  return res.status(401).send('You do not have permission');
 };

@@ -48,19 +48,25 @@ export default function SignUp() {
     password: '',
   });
 
+  const [signedUp, setSignedUp] = useState(false);
+
   const handleChange = name => (event) => {
     setValues({ ...values, [name]: event.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post(`${API_URL}/auth/signup`, {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      password: values.password,
-    });
-    return <Redirect to="/signin" />;
+    try {
+      await axios.post(`${API_URL}/auth/signup`, {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+      });
+      setSignedUp(true);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -73,7 +79,10 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate>
+        <form
+          className={classes.form}
+          onSubmit={handleSubmit}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -136,10 +145,16 @@ export default function SignUp() {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={handleSubmit}
           >
             Sign Up
           </Button>
+          {signedUp
+          && (
+          <Typography>
+            Account created. Please check your inbox for a verification email.
+          </Typography>
+          )
+          }
           <Grid container justify="flex-end">
             <Grid item>
               <Link href="/signin" variant="body2">

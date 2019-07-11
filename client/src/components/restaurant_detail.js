@@ -199,7 +199,7 @@ const RestaurantDetail = (props) => {
             rating > 0 ? `${Number.parseFloat(rating).toFixed(1)} / 5` : ''
           }
         </Box>
-        {!props.isOwner
+        {!props.isOwner && highestReview && lowestReview
           && (
             <Grid container spacing={5} className={classes.review}>
               <Grid item xs={12} sm={6}>

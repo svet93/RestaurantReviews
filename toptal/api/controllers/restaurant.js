@@ -22,7 +22,12 @@ exports.getRestaurants = async (req, res) => {
     const filterObj = {
       where,
       include: [{ model: Review, attributes: [] }],
-      attributes: ['restaurant_id', 'name', 'description', 'image_url', [sequelize.fn('avg', sequelize.col('stars')), 'rating']],
+      attributes: ['restaurant_id',
+        'name',
+        'description',
+        'image_url',
+        [sequelize.fn('avg', sequelize.col('stars')), 'rating'],
+      ],
       group: ['restaurant_id', 'name', 'description', 'image_url'],
     };
 

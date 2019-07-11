@@ -9,7 +9,7 @@ const login = () => {
   return function(done) {
       server
           .post('/auth/login')
-          .send({ email: 'svet@theproscloset.com', password: 'test123' })
+          .send({ email: 'svet.93@gmail.com', password: 'test123' })
           .expect(200)
           .end(onResponse);
 
@@ -56,6 +56,26 @@ describe('controllers', () => {
             should.not.exist(err);
 
             res.body.should.be.an.Array();
+
+            done();
+          });
+      });
+
+      it('should create a restaurant', (done) => {
+        server
+          .post('/restaurants')
+          .send({
+            name: 'Test Restaurant',
+            description: 'Testing 123',
+            imageUrl: 'https://www.tasteofhome.com/wp-content/uploads/2018/01/Scrum-Delicious-Burgers_EXPS_CHMZ19_824_B10_30_2b.jpg',
+            userId: 1,
+          })
+          .set('Accept', 'application/json')
+          .set('Authorization', `Bearer ${cookie}`)
+          .expect('Content-Type', /json/)
+          .expect(201)
+          .end((err, res) => {
+            should.not.exist(err);
 
             done();
           });

@@ -53,6 +53,7 @@ const SignIn = (props) => {
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const setVariables = (user, token) => {
     localStorage.setItem('role', user.role);
@@ -67,6 +68,7 @@ const SignIn = (props) => {
 
   const handleLoginLocal = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     try {
       const res = await axios.post(`${API_URL}/auth/login`, {
         email,
@@ -76,6 +78,9 @@ const SignIn = (props) => {
       setVariables(user, token);
     } catch (error) {
       console.error(error);
+      if (error.response && error.response.status === 401) {
+        setErrorMsg('Invalid credentials');
+      }
     }
   };
 
@@ -150,7 +155,6 @@ const SignIn = (props) => {
         </Box>
         <form
           className={classes.form}
-          noValidate
           onSubmit={handleLoginLocal}
         >
           <TextField
@@ -186,6 +190,11 @@ const SignIn = (props) => {
           >
             Sign In
           </Button>
+          {errorMsg
+            && (
+            <Typography>{errorMsg}</Typography>
+            )
+          }
           <Grid container>
             <Grid item xs>
               <Link href="/resetPassword" variant="body2">

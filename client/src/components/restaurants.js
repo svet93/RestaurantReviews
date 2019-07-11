@@ -56,9 +56,6 @@ const Restaurants = (props) => {
   };
 
   const handleClick = (id, reviews) => {
-    if (!reviews) {
-      return;
-    }
     props.history.push(`/${props.isOwner ? 'myRestaurants' : 'restaurants'}/${id}`);
   };
 
